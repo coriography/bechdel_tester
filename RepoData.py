@@ -35,4 +35,25 @@ class RepoData:
             names.append(user_info['name'])
         return names
 
+    def evaluate_collaborator_gender(self):
+        """Currently hard-coded for MVP - should update this to use Babynames API to determine gender"""
+        known_contributors = {
+            'man': ['Adam'],
+            'woman': ['Cori'],
+            'non-binary/gender non-conforming': [],
+            'genderqueer or gender-fluid': [],
+        }
+        pass
+
+    def get_first_name_from_name(self):
+        pass
+
+    def get_functions_by_author_gender(self):
+        """For MVP, get functions that appear in author's commits - i.e. last edited"""
+        pass
+
+    def get_functions_called_by_functions(self):
+        pass
+
+
 
