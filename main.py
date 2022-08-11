@@ -20,7 +20,7 @@ print(f'Creating RepoData object for {owner}/{repo}...\n')
 sleep(3)
 repo_data = RepoData(owner, repo, auth_token)
 print('Getting collaborator names...\n')
-names = repo_data.get_collaborator_first_names()
+names = repo_data.collaborator_usernames
 print(f'Collaborators: {names}\n')
 sleep(1)
 print('Guessing collaborator gender...\n')

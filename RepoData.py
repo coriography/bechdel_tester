@@ -1,3 +1,6 @@
+from enum import Enum
+from collections import defaultdict
+from typing import List
 import requests
 
 # url = 'https://api.github.com/repos/coriography/cello_tree/collaborators'
@@ -7,18 +10,20 @@ import requests
 # collaborators = requests.get(url, headers=headers).json()
 # print(collaborators)
 
-man = 'man'
-woman = 'woman'
-non_binary = 'non_binary'
-unknown = 'unknown'
+class GenderIdentity(str, Enum):
+    man = 'man'
+    woman = 'woman'
+    non_binary = 'non_binary'
+    unknown = 'unknown'
+
 known_contributors = {
-    'Adam': man,
-    'Akira': non_binary,
-    'Cori': woman,
-    'Cyril': man,
-    'Erica': woman,
-    'Lauren': woman,
-    'Yaakov': man
+    'Adam': GenderIdentity.man,
+    'Akira': GenderIdentity.non_binary,
+    'Cori': GenderIdentity.woman,
+    'Cyril': GenderIdentity.man,
+    'Erica': GenderIdentity.woman,
+    'Lauren': GenderIdentity.woman,
+    'Yaakov': GenderIdentity.man
 }
 
 
@@ -28,59 +33,65 @@ class RepoData:
         self.owner = owner
         self.repo = repo
         self.headers = {'Authorization': 'token ' + auth_token}
-        self.collaborator_usernames = None
-        self.first_names = None
+        self._collaborator_usernames = []
+        self._first_names = []
         self.collaborators_by_gender = None
 
     def __repr__(self):
         return f'Instance of RepoData created where owner={self.owner} and repo={self.repo}'
 
-    def get_collaborator_usernames(self):
+    @property
+    def collaborator_usernames(self) -> List[str]:
+        if self._collaborator_usernames:
+            return self._collaborator_usernames
+
+        # Define the url which to make the request
         url = f'https://api.github.com/repos/{self.owner}/{self.repo}/collaborators'
         collaborators = requests.get(url, headers=self.headers).json()
-        self.collaborator_usernames = []
-        for collaborator in collaborators:
-            self.collaborator_usernames.append(collaborator['login'])
-        return self.collaborator_usernames
 
-    def get_collaborator_first_names(self):
-        if self.collaborator_usernames is None:
-            self.get_collaborator_usernames()
-        self.first_names = []
+        # Extract values from list
+        result = [x['login'] for x in collaborators]
+
+        # Save values for next time
+        self._collaborator_usernames = result
+        return self._collaborator_usernames
+
+    @property
+    def first_names(self) -> List[str]:
+
+        if self._first_names:
+            return self._first_names
+
+        result = []
         for username in self.collaborator_usernames:
             url = f'https://api.github.com/users/{username}'
             user_info = requests.get(url, headers=self.headers).json()
-            self.first_names.append((user_info['name'].split())[0])
-        return self.first_names
+            result.append((user_info['name'].split())[0])  # Note: This line of code is brittle
+
+        # Override default (save values)
+        self._first_names = result
+        return self._first_names
+
 
     def get_collaborators_by_gender(self):
         """
         Returns dictionary of collaborators by gender.
-        Hard-coded known collaborators dict for MVP - should update this to use Baby Names API to determine gender.
-        Written as a CLI program for MVP - update print statements with addition of web interface.
-        """
-        if self.first_names is None:
-            self.get_collaborator_first_names()
+        Hard-coded known collaborators dict for MVP - should update this to
+        use Baby Names API to determine gender.
 
-        self.collaborators_by_gender = {
-            woman: [],
-            non_binary: [],
-            man: [],
-            unknown: []
-        }
+        Written as a CLI program for MVP - update print statements
+        with addition of web interface.
+        """
+
+        self.collaborators_by_gender = defaultdict(list)
 
         for name in self.first_names:
-            if name in known_contributors:
-                gender = known_contributors[name]
-                self.collaborators_by_gender[gender].append(name)
-            else:
-                self.collaborators_by_gender[unknown].append(name)
+            gender = known_contributors.get(name, GenderIdentity.unknown)
+            self.collaborators_by_gender[gender].append(name)
 
-        print(f'women: {len(self.collaborators_by_gender[woman])}')
-        print(f'men: {len(self.collaborators_by_gender[man])}')
-        print(f'non-binary: {len(self.collaborators_by_gender[non_binary])}')
-        print(f'unknown: {len(self.collaborators_by_gender[unknown])}')
-        print('\n')
+        for key, value in self.collaborators_by_gender.items():
+            print(f'{key}: {len(value)}')
+
 
     def get_functions_by_author_gender(self):
         """For MVP, get functions that appear in author's commits - i.e. last edited"""

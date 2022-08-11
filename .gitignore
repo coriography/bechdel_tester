@@ -1,3 +1,10 @@
 secrets.sh
 .idea/
+
+# Ignore caching
 __pycache__/
+.mypy_cache/
+
+# virtual env
+env
+venv
