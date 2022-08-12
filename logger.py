@@ -5,7 +5,7 @@ from rich.console import Console
 # Logging should be for system only
 FORMAT = "%(message)s"
 logging.basicConfig(
-    level="NOTSET", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
+    level="INFO", format=FORMAT, datefmt="[%X]", handlers=[RichHandler()]
 )
 
 LOGGER = logging.getLogger("rich")
