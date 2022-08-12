@@ -4,6 +4,7 @@ secrets.sh
 # Ignore caching
 __pycache__/
 .mypy_cache/
+*.DS_Store
 
 # virtual env
 env

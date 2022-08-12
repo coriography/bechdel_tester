@@ -1,16 +1,12 @@
+import os
 from enum import Enum
 from collections import defaultdict
 from typing import List
 import requests
 
-# url = 'https://api.github.com/repos/coriography/cello_tree/collaborators'
-
-# headers = {'Authorization': 'token ' + ''}  # cello tree token
-# headers = {'Authorization': 'token ' + ''}
-# collaborators = requests.get(url, headers=headers).json()
-# print(collaborators)
 
 class GenderIdentity(str, Enum):
+    """String enum representing several gender identities"""
     man = 'man'
     woman = 'woman'
     non_binary = 'non_binary'
@@ -29,10 +25,10 @@ known_contributors = {
 
 class RepoData:
 
-    def __init__(self, owner, repo, auth_token=''):
+    def __init__(self, owner: str, repo: str) -> None:
         self.owner = owner
         self.repo = repo
-        self.headers = {'Authorization': 'token ' + auth_token}
+        self.headers = {'Authorization': 'token ' + os.environ['AUTH_TOKEN']}
         self._collaborator_usernames = []
         self._first_names = []
         self.collaborators_by_gender = None
