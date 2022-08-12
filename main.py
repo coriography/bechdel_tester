@@ -63,7 +63,7 @@ print(f'Creating RepoData object for {my_repo_info.owner}/{my_repo_info.repo}...
 sleep(3)
 repo_data = RepoData(my_repo_info.owner, my_repo_info.repo)
 print('Getting collaborator names...\n')
-names = repo_data.collaborator_usernames
+names = [" ".join(x) for x in repo_data.first_names]
 print(f'Collaborators: {names}\n')
 sleep(1)
 print('Guessing collaborator gender...\n')
